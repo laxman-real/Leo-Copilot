@@ -9,9 +9,37 @@ import pirateCardBg from "../../assets/pirate-card-bg.png";
 import supportCardBgExpanded from "../../assets/support-card-bg-expanded.png";
 import brokerCardBgExpanded from "../../assets/broker-card-bg-expanded.png";
 import pirateCardBgExpanded from "../../assets/pirate-card-bg-expanded.png";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { History, X, ChevronRight } from "lucide-react";
-import { useVersion } from "../versioning/VersionContext";
+
+const CONFIG = {
+  header: {
+    titleText: "Leo",
+    titleFontSize: "14px",
+    headerBgColor: "#050e3d",
+    borderColor: "#2d355c",
+  },
+  panel: {
+    panelBgGradient:
+      "linear-gradient(90deg, rgb(5, 14, 61) 0%, rgb(5, 14, 61) 100%), linear-gradient(-90deg, rgb(5, 68, 101) 8.9636%, rgb(5, 14, 61) 4.4818%)",
+    companionSectionTitle: "Choose your Leo companion",
+    companionSectionSubtitle: "Leo adapts to your needs.",
+  },
+  welcomeMessage: { userName: "Jane", notificationCount: 3 },
+  notification: {
+    visible: true,
+    content: "This is a notification that a user must complete",
+    buttonLabel: "Generate",
+    buttonBgColor: "#00fbf0",
+    buttonTextColor: "#050e3d",
+    seeAllCount: 20,
+  },
+  companionCards: [
+    { title: "Support", description: "Your expert real estate assistant", bgImage: supportCardBg, bgImageExpanded: supportCardBgExpanded },
+    { title: "Broker", description: "Your right hand in transaction related questions", bgImage: brokerCardBg, bgImageExpanded: brokerCardBgExpanded },
+    { title: "Spring Bunny", description: "Arrrr let's set sail to your next closing.", bgImage: pirateCardBg, bgImageExpanded: pirateCardBgExpanded },
+  ],
+};
 
 function ChevronArrows() {
   return (
@@ -154,10 +182,9 @@ function LeoContainer1() {
 }
 
 function Title() {
-  const { currentConfig } = useVersion();
   return (
     <div className="content-stretch flex gap-[4px] items-center relative shrink-0" data-name="Title">
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[22px] not-italic relative shrink-0 text-white whitespace-nowrap" style={{ fontSize: currentConfig.header.titleFontSize }}>{currentConfig.header.titleText}</p>
+      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[22px] not-italic relative shrink-0 text-white whitespace-nowrap" style={{ fontSize: CONFIG.header.titleFontSize }}>{CONFIG.header.titleText}</p>
     </div>
   );
 }
@@ -236,8 +263,7 @@ function ClipboardCheckIcon() {
 }
 
 function NotificationsContainer() {
-  const { currentConfig } = useVersion();
-  const { notification } = currentConfig;
+  const { notification } = CONFIG;
 
   if (!notification.visible) return null;
 
@@ -288,8 +314,7 @@ function NotificationsContainer() {
 }
 
 function LeoWindowContent() {
-  const { currentConfig } = useVersion();
-  const { welcomeMessage } = currentConfig;
+  const { welcomeMessage } = CONFIG;
   return (
     <div className="flex-[1_0_0] min-h-0 relative w-full overflow-y-auto" data-name="Leo Window Content">
       <div className="content-stretch flex flex-col gap-[16px] items-start p-[16px] relative w-full">
@@ -312,11 +337,10 @@ function LeoWindowContent() {
 
 
 function Frame4() {
-  const { currentConfig } = useVersion();
   return (
     <div className="content-stretch flex flex-col gap-[4px] items-center not-italic relative shrink-0 w-full">
-      <p className="font-['PP_Telegraf:Medium',sans-serif] leading-[22px] relative shrink-0 text-[20px] text-white text-center">{currentConfig.panel.companionSectionTitle}</p>
-      <p className="font-['Inter:Regular',sans-serif] font-normal leading-[20px] relative shrink-0 text-[#bfc3ca] text-[14px] text-center">{currentConfig.panel.companionSectionSubtitle}</p>
+      <p className="font-['PP_Telegraf:Medium',sans-serif] leading-[22px] relative shrink-0 text-[20px] text-white text-center">{CONFIG.panel.companionSectionTitle}</p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal leading-[20px] relative shrink-0 text-[#bfc3ca] text-[14px] text-center">{CONFIG.panel.companionSectionSubtitle}</p>
     </div>
   );
 }
@@ -376,8 +400,7 @@ function ThumbsUpLight3() {
 }
 
 function SupportCard({ isExpanded }: { isExpanded?: boolean }) {
-  const { currentConfig } = useVersion();
-  const card = currentConfig.companionCards[0];
+  const card = CONFIG.companionCards[0];
   return (
     <div className="h-[98px] relative rounded-[7px] shrink-0 w-full border-[0.644px] border-[rgba(255,255,255,0.2)] border-solid overflow-clip" data-name="Support Card">
       <img src={isExpanded ? card.bgImageExpanded : card.bgImage} alt="" className="absolute inset-0 size-full object-cover pointer-events-none rounded-[7px]" />
@@ -396,8 +419,7 @@ function SupportCard({ isExpanded }: { isExpanded?: boolean }) {
 
 
 function BrokerCard({ isExpanded }: { isExpanded?: boolean }) {
-  const { currentConfig } = useVersion();
-  const card = currentConfig.companionCards[1];
+  const card = CONFIG.companionCards[1];
   return (
     <div className="h-[98px] relative rounded-[7px] shrink-0 w-full border-[0.644px] border-[rgba(255,255,255,0.2)] border-solid overflow-clip" data-name="Broker Card">
       <img src={isExpanded ? card.bgImageExpanded : card.bgImage} alt="" className="absolute inset-0 size-full object-cover pointer-events-none rounded-[7px]" />
@@ -419,8 +441,7 @@ function BrokerCard({ isExpanded }: { isExpanded?: boolean }) {
 }
 
 function PirateCard({ isExpanded }: { isExpanded?: boolean }) {
-  const { currentConfig } = useVersion();
-  const card = currentConfig.companionCards[2];
+  const card = CONFIG.companionCards[2];
   return (
     <div className="h-[98px] relative rounded-[7px] shrink-0 w-full border-[0.644px] border-[rgba(255,255,255,0.2)] border-solid overflow-clip" data-name="Pirate Card">
       <img src={isExpanded ? card.bgImageExpanded : card.bgImage} alt="" className="absolute inset-0 size-full object-cover pointer-events-none rounded-[7px]" />
@@ -478,11 +499,10 @@ function BottomInputContainer({ isExpanded }: { isExpanded?: boolean }) {
 }
 
 function LeoWindow({ onClose, isExpanded, onToggleExpand }: { onClose?: () => void; isExpanded?: boolean; onToggleExpand?: () => void }) {
-  const { currentConfig } = useVersion();
   return (
-    <div className={`h-full max-w-[720px] min-w-[280px] relative shrink-0 transition-all duration-300 ${isExpanded ? "w-[720px]" : "w-[325px]"}`} data-name="Leo Window" style={{ backgroundImage: currentConfig.panel.panelBgGradient }}>
+    <div className={`h-full max-w-[720px] min-w-[280px] relative shrink-0 transition-all duration-300 ${isExpanded ? "w-[720px]" : "w-[325px]"}`} data-name="Leo Window" style={{ backgroundImage: CONFIG.panel.panelBgGradient }}>
       <div className="content-stretch flex flex-col items-start justify-between overflow-clip relative size-full">
-        <div className="relative shrink-0 w-full border-b border-solid" data-name=".Leo Header" style={{ backgroundColor: currentConfig.header.headerBgColor, borderColor: currentConfig.header.borderColor }}>
+        <div className="relative shrink-0 w-full border-b border-solid" data-name=".Leo Header" style={{ backgroundColor: CONFIG.header.headerBgColor, borderColor: CONFIG.header.borderColor }}>
           <div className="flex flex-row items-center overflow-clip size-full">
             <div className="content-stretch flex items-center px-[8px] py-[12px] relative w-full">
               <LeoIconContainer />
@@ -501,32 +521,12 @@ function LeoWindow({ onClose, isExpanded, onToggleExpand }: { onClose?: () => vo
 }
 
 export default function LeoContainer() {
-  const { currentConfig, updateConfig } = useVersion();
-  const [expanded, setExpanded] = useState(currentConfig.panel.defaultExpanded);
-  const [isExpanded, setIsExpanded] = useState(currentConfig.panel.defaultWidth === "expanded");
+  const [expanded, setExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  // Sync local state when config changes (undo/load version)
-  useEffect(() => {
-    setExpanded(currentConfig.panel.defaultExpanded);
-    setIsExpanded(currentConfig.panel.defaultWidth === "expanded");
-  }, [currentConfig.panel.defaultExpanded, currentConfig.panel.defaultWidth]);
-
-  const handleToggleExpand = () => {
-    const next = !isExpanded;
-    setIsExpanded(next);
-    updateConfig({ panel: { defaultWidth: next ? "expanded" : "collapsed" } });
-  };
-
-  const handleClose = () => {
-    setExpanded(false);
-    setIsExpanded(false);
-    updateConfig({ panel: { defaultExpanded: false, defaultWidth: "collapsed" } });
-  };
-
-  const handleOpen = () => {
-    setExpanded(true);
-    updateConfig({ panel: { defaultExpanded: true } });
-  };
+  const handleToggleExpand = () => setIsExpanded((prev) => !prev);
+  const handleClose = () => { setExpanded(false); setIsExpanded(false); };
+  const handleOpen = () => setExpanded(true);
 
   return (
     <div className="content-stretch flex items-center relative h-full shrink-0" data-name="Leo Container">
