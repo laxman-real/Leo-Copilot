@@ -9,12 +9,9 @@ import pirateCardBg from "../../assets/pirate-card-bg.png";
 import supportCardBgExpanded from "../../assets/support-card-bg-expanded.png";
 import brokerCardBgExpanded from "../../assets/broker-card-bg-expanded.png";
 import pirateCardBgExpanded from "../../assets/pirate-card-bg-expanded.png";
-import { useState } from "react";
-import { History, X, ChevronRight, ChevronUp, Radio, Loader2 } from "lucide-react";
-import { ABRProvider, useABR } from "../abr/ABRContext";
-import { ABRFullNotification, ABRChatSession, ABRReviewSession } from "../abr/ABRPanel";
-
-
+import { useState, useEffect } from "react";
+import { History, X, ChevronRight } from "lucide-react";
+import { useVersion } from "../versioning/VersionContext";
 
 function ChevronArrows() {
   return (
@@ -157,9 +154,10 @@ function LeoContainer1() {
 }
 
 function Title() {
+  const { currentConfig } = useVersion();
   return (
     <div className="content-stretch flex gap-[4px] items-center relative shrink-0" data-name="Title">
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[22px] not-italic relative shrink-0 text-[14px] text-white whitespace-nowrap">Leo</p>
+      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[22px] not-italic relative shrink-0 text-white whitespace-nowrap" style={{ fontSize: currentConfig.header.titleFontSize }}>{currentConfig.header.titleText}</p>
     </div>
   );
 }
@@ -238,11 +236,18 @@ function ClipboardCheckIcon() {
 }
 
 function NotificationsContainer() {
+  const { currentConfig } = useVersion();
+  const { notification } = currentConfig;
+
+  if (!notification.visible) return null;
+
   return (
     <div className="content-stretch flex flex-col gap-[15px] items-center relative shrink-0 w-full" data-name="Notifications Container">
+      {/* Notification Card */}
       <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Notification Prompts">
         <div className="bg-[#1c244e] border border-[#2d355c] border-solid content-stretch cursor-pointer flex flex-col gap-[12px] items-center justify-center px-[16px] py-[12px] relative rounded-[8px] shrink-0 w-full" data-name="Homepage Notifications_Mobile">
           <div className="content-stretch flex flex-col gap-[10px] items-start relative shrink-0 w-full">
+            {/* Notification Content Row */}
             <div className="content-stretch flex min-h-[44px] items-start min-h-[32px] relative shrink-0 w-full">
               <div className="content-stretch flex flex-[1_0_0] gap-[8px] items-start min-h-px min-w-px relative self-stretch">
                 <div className="content-stretch flex flex-[1_0_0] gap-[12px] min-h-[44px] items-center min-w-px relative">
@@ -250,9 +255,10 @@ function NotificationsContainer() {
                     <ClipboardCheckIcon />
                   </div>
                   <div className="flex flex-[1_0_0] flex-col font-['Inter:Regular',sans-serif] font-normal h-full justify-center min-h-px min-w-px not-italic relative text-[16px] text-white">
-                    <p className="leading-[22px]">This is a notification that a user must complete</p>
+                    <p className="leading-[22px]">{notification.content}</p>
                   </div>
                 </div>
+                {/* Close Button */}
                 <div className="content-stretch flex gap-[4px] items-center justify-center p-[8px] relative rounded-[4px] shrink-0 size-[24px]" data-name="Icon Button">
                   <div className="overflow-clip relative shrink-0 size-[16px]">
                     <div className="absolute flex flex-col inset-0 items-center justify-center">
@@ -262,209 +268,55 @@ function NotificationsContainer() {
                 </div>
               </div>
             </div>
-            <div className="flex items-start pt-[8px] relative shrink-0" data-name="Button group mobile">
-              <div className="cursor-pointer flex items-start" data-name="Buttons">
-                <div className="flex gap-[8px] h-[32px] items-center justify-center overflow-clip px-[16px] relative rounded-[6px] bg-[#00fbf0]" data-name="Button">
-                  <p className="font-['Inter:Medium',sans-serif] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[#050e3d] text-center whitespace-nowrap">Generate</p>
+            {/* Generate Button */}
+            <div className="content-stretch flex gap-[10px] items-start pt-[8px] relative shrink-0 w-full" data-name="Button group mobile">
+              <div className="content-stretch flex flex-[1_0_0] gap-[10px] items-center min-h-px min-w-px relative">
+                <div className="content-stretch cursor-pointer flex flex-[1_0_0] items-start min-h-px min-w-px relative" data-name="Buttons">
+                  <div className="content-stretch flex flex-[1_0_0] gap-[8px] h-[32px] items-center justify-center min-h-px min-w-px overflow-clip p-[12px] relative rounded-[6px]" data-name="Button" style={{ backgroundColor: notification.buttonBgColor }}>
+                    <p className="font-['Inter:Medium',sans-serif] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-center whitespace-nowrap" style={{ color: notification.buttonTextColor }}>{notification.buttonLabel}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <p className="font-['Inter:Medium',sans-serif] font-medium leading-[18px] not-italic relative shrink-0 text-[14px] text-[#00fbf0] text-right w-full cursor-pointer">{`See All (20) `}</p>
+      {/* See All Link */}
+      <p className="font-['Inter:Medium',sans-serif] font-medium leading-[18px] not-italic relative shrink-0 text-[14px] text-[#00fbf0] text-right w-full cursor-pointer">{`See All (${notification.seeAllCount}) `}</p>
     </div>
   );
 }
-
-function ABRDemoTrigger() {
-  const { phase, startScan, reset } = useABR();
-  return (
-    <div className="shrink-0 px-[16px] mt-[4px]">
-      {phase === "idle" ? (
-        <button
-          type="button"
-          onClick={() => startScan({
-            transactionName: "1234 Elm Street",
-            checklistName: "Buyer Documents",
-            documents: [
-              { name: "Purchase_Agreement.pdf", pages: 6 },
-              { name: "Seller_Disclosure.pdf", pages: 4 },
-              { name: "Title_Insurance_Commitment.pdf", pages: 12 },
-            ],
-          })}
-          className="flex items-center gap-[8px] w-full h-[32px] px-[10px] rounded-[6px] bg-transparent border border-dashed border-[#2d355c] hover:bg-[#0f1740] cursor-pointer transition-colors group"
-        >
-          <Radio className="w-3.5 h-3.5 text-[#475569] group-hover:text-[#00fbf0] transition-colors" />
-          <span className="font-['Inter',sans-serif] font-normal text-[11px] text-[#475569] group-hover:text-[#64748b] transition-colors">
-            Simulate Rezen doc upload
-          </span>
-        </button>
-      ) : phase !== "review" && phase !== "completed" ? (
-        <button
-          type="button"
-          onClick={reset}
-          className="flex items-center gap-[8px] w-full h-[28px] px-[10px] rounded-[6px] bg-transparent border border-dashed border-[#1e293b] hover:bg-[#0f1740] cursor-pointer transition-colors"
-        >
-          <span className="font-['Inter',sans-serif] font-normal text-[11px] text-[#475569]">
-            Reset demo
-          </span>
-        </button>
-      ) : null}
-    </div>
-  );
-}
-
-function HeroMessage() {
-  const { phase } = useABR();
-  const textBase = "font-['Inter',sans-serif] font-normal text-[16px] leading-[1.35]";
-
-  // Default — idle, notification, all-clear
-  return (
-    <p className={`flex-[1_0_0] ${textBase} leading-[0] min-h-px min-w-px not-italic relative text-white`}>
-      <span className="leading-[1.25]">Hi Jane</span>
-      <span className="leading-[1.25] text-[#94a3b8]">{`, you have `}</span>
-      <span className="font-['Inter:Bold',sans-serif] font-bold leading-[1.25] text-[#94a3b8]">3</span>
-      <span className="leading-[1.25] text-[#94a3b8]">{` notifications.`}</span>
-    </p>
-  );
-}
-
-function ABRScanningHero() {
-  return (
-    <>
-      <style>{`
-        @keyframes abr-ring-spin {
-          to { transform: rotate(360deg); }
-        }
-        @keyframes abr-shimmer {
-          0%   { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-        @keyframes abr-pulse-glow {
-          0%, 100% { opacity: 0.4; transform: scale(1); }
-          50%      { opacity: 0.7; transform: scale(1.08); }
-        }
-        @keyframes abr-dot-bounce {
-          0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
-          40% { opacity: 1; transform: translateY(-3px); }
-        }
-      `}</style>
-
-      <div className="relative shrink-0 w-full rounded-[10px] overflow-hidden">
-        {/* Ambient gradient background */}
-        <div
-          className="absolute inset-0 rounded-[10px]"
-          style={{
-            background: "linear-gradient(135deg, rgba(73,103,253,0.08) 0%, rgba(0,251,240,0.06) 50%, rgba(73,103,253,0.08) 100%)",
-          }}
-        />
-        {/* Subtle scan-line sweep */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: "linear-gradient(90deg, transparent 0%, rgba(0,251,240,0.04) 45%, rgba(73,103,253,0.06) 50%, rgba(0,251,240,0.04) 55%, transparent 100%)",
-            backgroundSize: "200% 100%",
-            animation: "abr-shimmer 3s ease-in-out infinite",
-          }}
-        />
-
-        <div className="relative flex items-center gap-[14px] px-[14px] py-[14px]">
-          {/* Orb with rotating gradient ring */}
-          <div className="relative shrink-0 size-[52px]">
-            {/* Pulsing glow behind orb */}
-            <div
-              className="absolute inset-[-6px] rounded-full"
-              style={{
-                background: "radial-gradient(circle, rgba(0,251,240,0.25) 0%, rgba(73,103,253,0.15) 50%, transparent 70%)",
-                animation: "abr-pulse-glow 2.5s ease-in-out infinite",
-              }}
-            />
-            {/* Rotating gradient ring */}
-            <div
-              className="absolute inset-[-3px] rounded-full"
-              style={{
-                background: "conic-gradient(from 0deg, #4967FD, #00fbf0, #4967FD, transparent, #4967FD)",
-                animation: "abr-ring-spin 2s linear infinite",
-              }}
-            />
-            {/* Inner mask to make ring hollow */}
-            <div className="absolute inset-[1.5px] rounded-full bg-[#050e3d]" />
-            {/* Avatar */}
-            <img
-              src={leoOrbHero}
-              alt="Leo"
-              className="absolute inset-[3px] size-[46px] object-cover rounded-full"
-            />
-          </div>
-
-          {/* Text */}
-          <div className="flex-1 min-w-0">
-            <p className="font-['Inter',sans-serif] font-normal text-[16px] leading-[1.25] text-white m-0">
-              Hi Jane
-            </p>
-            <div className="flex items-center gap-[2px] mt-[4px]">
-              <span
-                className="font-['Inter',sans-serif] font-medium text-[13px] leading-[1.2]"
-                style={{
-                  background: "linear-gradient(90deg, #94a3b8 0%, #00fbf0 40%, #4967FD 60%, #94a3b8 100%)",
-                  backgroundSize: "200% 100%",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  animation: "abr-shimmer 2.5s ease-in-out infinite",
-                }}
-              >
-                ABR is running
-              </span>
-              {/* Bouncing dots */}
-              <span className="flex items-center gap-[2px] ml-[3px]">
-                {[0, 1, 2].map((i) => (
-                  <span
-                    key={i}
-                    className="block size-[3px] rounded-full bg-[#00fbf0]"
-                    style={{ animation: `abr-dot-bounce 1.2s ease-in-out ${i * 0.15}s infinite` }}
-                  />
-                ))}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
-
 
 function LeoWindowContent() {
-  const { phase } = useABR();
-  const isScanning = phase === "scanning";
-
+  const { currentConfig } = useVersion();
+  const { welcomeMessage } = currentConfig;
   return (
     <div className="flex-[1_0_0] min-h-0 relative w-full overflow-y-auto" data-name="Leo Window Content">
       <div className="content-stretch flex flex-col gap-[16px] items-start p-[16px] relative w-full">
-        {isScanning ? (
-          <ABRScanningHero />
-        ) : (
-          <div className="content-stretch flex gap-[12px] items-center relative shrink-0 w-full" data-name="Leo Welcome Message">
-            <div className="relative shrink-0 size-[48px]" data-name="Leo's UI Bubble">
-              <img src={leoOrbHero} alt="Leo" className="absolute inset-0 size-full object-cover rounded-full" />
-            </div>
-            <HeroMessage />
+        <div className="content-stretch flex gap-[12px] items-center relative shrink-0 w-full" data-name="Leo Welcome Message">
+          <div className="relative shrink-0 size-[48px]" data-name="Leo's UI Bubble">
+            <img src={leoOrbHero} alt="Leo" className="absolute inset-0 size-full object-cover rounded-full" />
           </div>
-        )}
+          <p className="flex-[1_0_0] font-['Inter:Regular',sans-serif] font-normal leading-[0] min-h-px min-w-px not-italic relative text-[16px] text-white">
+            <span className="leading-[1.25]">Hi {welcomeMessage.userName}</span>
+            <span className="leading-[1.25] text-[#94a3b8]">{`, you have `}</span>
+            <span className="font-['Inter:Bold',sans-serif] font-bold leading-[1.25] text-[#94a3b8]">{welcomeMessage.notificationCount}</span>
+            <span className="leading-[1.25] text-[#94a3b8]">{` notifications.`}</span>
+          </p>
+        </div>
         <NotificationsContainer />
       </div>
-      <ABRDemoTrigger />
     </div>
   );
 }
 
 
 function Frame4() {
+  const { currentConfig } = useVersion();
   return (
     <div className="content-stretch flex flex-col gap-[4px] items-center not-italic relative shrink-0 w-full">
-      <p className="font-['PP_Telegraf:Medium',sans-serif] leading-[22px] relative shrink-0 text-[20px] text-white text-center">Choose your Leo companion</p>
-      <p className="font-['Inter:Regular',sans-serif] font-normal leading-[20px] relative shrink-0 text-[#bfc3ca] text-[14px] text-center">Leo adapts to your needs.</p>
+      <p className="font-['PP_Telegraf:Medium',sans-serif] leading-[22px] relative shrink-0 text-[20px] text-white text-center">{currentConfig.panel.companionSectionTitle}</p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal leading-[20px] relative shrink-0 text-[#bfc3ca] text-[14px] text-center">{currentConfig.panel.companionSectionSubtitle}</p>
     </div>
   );
 }
@@ -524,13 +376,15 @@ function ThumbsUpLight3() {
 }
 
 function SupportCard({ isExpanded }: { isExpanded?: boolean }) {
+  const { currentConfig } = useVersion();
+  const card = currentConfig.companionCards[0];
   return (
     <div className="h-[98px] relative rounded-[7px] shrink-0 w-full border-[0.644px] border-[rgba(255,255,255,0.2)] border-solid overflow-clip" data-name="Support Card">
-      <img src={isExpanded ? supportCardBgExpanded : supportCardBg} alt="" className="absolute inset-0 size-full object-cover pointer-events-none rounded-[7px]" />
+      <img src={isExpanded ? card.bgImageExpanded : card.bgImage} alt="" className="absolute inset-0 size-full object-cover pointer-events-none rounded-[7px]" />
       <div className="content-stretch flex items-center p-[16px] relative size-full">
         <div className="content-stretch flex flex-col gap-[4px] items-start not-italic relative shrink-0 text-white w-[207px]">
-          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[22px] relative shrink-0 text-[16px] whitespace-nowrap">Support</p>
-          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[20px] min-w-full relative shrink-0 text-[14px] w-[min-content]">Your expert real estate assistant</p>
+          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[22px] relative shrink-0 text-[16px] whitespace-nowrap">{card.title}</p>
+          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[20px] min-w-full relative shrink-0 text-[14px] w-[min-content]">{card.description}</p>
         </div>
         <div className="absolute backdrop-blur-[8px] content-stretch flex gap-[4px] items-center justify-center left-[77px] p-[8px] rounded-[4px] size-[24px] top-[14.4px]" data-name="Icon Button">
           <ThumbsUpLight3 />
@@ -542,13 +396,15 @@ function SupportCard({ isExpanded }: { isExpanded?: boolean }) {
 
 
 function BrokerCard({ isExpanded }: { isExpanded?: boolean }) {
+  const { currentConfig } = useVersion();
+  const card = currentConfig.companionCards[1];
   return (
     <div className="h-[98px] relative rounded-[7px] shrink-0 w-full border-[0.644px] border-[rgba(255,255,255,0.2)] border-solid overflow-clip" data-name="Broker Card">
-      <img src={isExpanded ? brokerCardBgExpanded : brokerCardBg} alt="" className="absolute inset-0 size-full object-cover pointer-events-none rounded-[7px]" />
+      <img src={isExpanded ? card.bgImageExpanded : card.bgImage} alt="" className="absolute inset-0 size-full object-cover pointer-events-none rounded-[7px]" />
       <div className="content-stretch flex items-start p-[16px] relative size-full">
         <div className="content-stretch flex flex-col gap-[4px] items-start not-italic relative shrink-0 text-white w-[207px]">
-          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[22px] relative shrink-0 text-[16px] whitespace-nowrap">Broker</p>
-          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[20px] min-w-full relative shrink-0 text-[14px] w-[min-content]">Your right hand in transaction related questions</p>
+          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[22px] relative shrink-0 text-[16px] whitespace-nowrap">{card.title}</p>
+          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[20px] min-w-full relative shrink-0 text-[14px] w-[min-content]">{card.description}</p>
         </div>
         <div className="absolute backdrop-blur-[8px] content-stretch flex gap-[4px] items-center justify-center left-[65px] p-[8px] rounded-[4px] size-[24px] top-[14.4px]" data-name="Icon Button">
           <div className="overflow-clip relative shrink-0 size-[16px]">
@@ -563,13 +419,15 @@ function BrokerCard({ isExpanded }: { isExpanded?: boolean }) {
 }
 
 function PirateCard({ isExpanded }: { isExpanded?: boolean }) {
+  const { currentConfig } = useVersion();
+  const card = currentConfig.companionCards[2];
   return (
     <div className="h-[98px] relative rounded-[7px] shrink-0 w-full border-[0.644px] border-[rgba(255,255,255,0.2)] border-solid overflow-clip" data-name="Pirate Card">
-      <img src={isExpanded ? pirateCardBgExpanded : pirateCardBg} alt="" className="absolute inset-0 size-full object-cover pointer-events-none rounded-[7px]" />
+      <img src={isExpanded ? card.bgImageExpanded : card.bgImage} alt="" className="absolute inset-0 size-full object-cover pointer-events-none rounded-[7px]" />
       <div className="content-stretch flex items-center p-[16px] relative size-full">
         <div className="content-stretch flex flex-col gap-[4px] items-start not-italic relative shrink-0 text-white w-[207px]">
-          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[22px] relative shrink-0 text-[16px] whitespace-nowrap">Spring Bunny</p>
-          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[20px] relative shrink-0 text-[14px]">{`Arrrr let's set sail to your next closing.`}</p>
+          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[22px] relative shrink-0 text-[16px] whitespace-nowrap">{card.title}</p>
+          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[20px] relative shrink-0 text-[14px]">{card.description}</p>
         </div>
         <div className="absolute backdrop-blur-[8px] content-stretch flex gap-[4px] items-center justify-center left-[120px] p-[8px] rounded-[4px] size-[24px] top-[14.4px]" data-name="Icon Button">
           <div className="overflow-clip relative shrink-0 size-[16px]">
@@ -593,108 +451,81 @@ function Frame6({ isExpanded }: { isExpanded?: boolean }) {
   );
 }
 
-function BottomInputContainer({ isExpanded }: { isExpanded?: boolean }) {
-  const [companionOpen, setCompanionOpen] = useState(true);
-
+function LeoAvatars({ isExpanded }: { isExpanded?: boolean }) {
   return (
-    <div className="relative shrink-0 w-full" data-name="Bottom Input Container">
-      <div className="flex flex-col items-center justify-end size-full">
-        <div className="content-stretch flex flex-col items-center justify-end pb-[8px] px-[8px] relative w-full">
-          <div className="relative rounded-[7px] shrink-0 w-full" data-name="Leo Avatars" style={{ backgroundImage: "linear-gradient(90deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.09) 100%), linear-gradient(90deg, rgb(5, 14, 61) 0%, rgb(5, 14, 61) 100%)" }}>
-            <div aria-hidden="true" className="absolute border-[#7a8496] border-[0.5px] border-solid inset-0 pointer-events-none rounded-[7px]" />
-            <div className="flex flex-col items-center justify-center size-full">
-              {/* Collapsible header */}
-              <button
-                type="button"
-                onClick={() => setCompanionOpen(!companionOpen)}
-                className="flex items-center justify-between w-full px-[16px] py-[12px] cursor-pointer bg-transparent border-none"
-              >
-                <div className="flex items-center gap-[8px]">
-                  <p className="font-['PP_Telegraf:Medium',sans-serif] leading-[22px] text-[16px] text-white text-left m-0">
-                    Choose your Leo companion
-                  </p>
-                </div>
-                <div className={`transition-transform duration-300 ${companionOpen ? "rotate-180" : "rotate-0"}`}>
-                  <ChevronUp className="w-4 h-4 text-[#bfc3ca]" />
-                </div>
-              </button>
-
-              {/* Expandable content area */}
-              <div
-                className="overflow-hidden transition-all duration-300 ease-in-out w-full"
-                style={{
-                  maxHeight: companionOpen ? "500px" : "0px",
-                  opacity: companionOpen ? 1 : 0,
-                }}
-              >
-                <div className="content-stretch flex flex-col gap-[12px] items-center px-[12px] pb-[16px] relative w-full">
-                  <p className="font-['Inter:Regular',sans-serif] font-normal leading-[20px] relative shrink-0 text-[#bfc3ca] text-[14px] text-center m-0">Leo adapts to your needs.</p>
-                  <Frame6 isExpanded={isExpanded} />
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="relative rounded-[7px] shrink-0 w-full" data-name="Leo Avatars" style={{ backgroundImage: "linear-gradient(90deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.09) 100%), linear-gradient(90deg, rgb(5, 14, 61) 0%, rgb(5, 14, 61) 100%)" }}>
+      <div aria-hidden="true" className="absolute border-[#7a8496] border-[0.5px] border-solid inset-0 pointer-events-none rounded-[7px]" />
+      <div className="flex flex-col items-center justify-center size-full">
+        <div className="content-stretch flex flex-col gap-[12px] items-center justify-center px-[12px] py-[16px] relative w-full">
+          <Frame4 />
+          <Frame6 isExpanded={isExpanded} />
         </div>
       </div>
     </div>
   );
 }
 
-function LeoWindowInner({ onClose, isExpanded, onToggleExpand }: { onClose?: () => void; isExpanded?: boolean; onToggleExpand?: () => void }) {
-  const { phase } = useABR();
-  const inReview = phase === "review" || phase === "completed";
-  const inChat = phase === "chat";
-  const inNotification = phase === "notification";
-  const showDefaultHeader = !inReview && !inChat && !inNotification;
-
+function BottomInputContainer({ isExpanded }: { isExpanded?: boolean }) {
   return (
-    <div className={`h-full max-w-[720px] min-w-[280px] relative shrink-0 transition-all duration-300 ${isExpanded ? "w-[720px]" : "w-[325px]"}`} data-name="Leo Window" style={{ backgroundImage: "linear-gradient(90deg, rgb(5, 14, 61) 0%, rgb(5, 14, 61) 100%), linear-gradient(-90deg, rgb(5, 68, 101) 8.9636%, rgb(5, 14, 61) 4.4818%)" }}>
-      <div className="content-stretch flex flex-col items-start justify-between overflow-clip relative size-full">
-        {showDefaultHeader && (
-          <div className="bg-[#050e3d] relative shrink-0 w-full border-b border-[#2d355c] border-solid" data-name=".Leo Header">
-            <div className="flex flex-row items-center overflow-clip size-full">
-              <div className="content-stretch flex items-center px-[8px] py-[12px] relative w-full">
-                <LeoIconContainer />
-                <TopIcons onClose={onClose} onToggleExpand={onToggleExpand} />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {inNotification ? (
-          <ABRFullNotification />
-        ) : inChat ? (
-          <ABRChatSession />
-        ) : inReview ? (
-          <ABRReviewSession />
-        ) : (
-          <>
-            <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px overflow-clip relative w-full" data-name="Leo Window Content">
-              <LeoWindowContent />
-            </div>
-            <BottomInputContainer isExpanded={isExpanded} />
-          </>
-        )}
+    <div className="relative shrink-0 w-full" data-name="Bottom Input Container">
+      <div className="flex flex-col items-center justify-end size-full">
+        <div className="content-stretch flex flex-col items-center justify-end pb-[8px] px-[8px] relative w-full">
+          <LeoAvatars isExpanded={isExpanded} />
+        </div>
       </div>
     </div>
   );
 }
 
-function LeoContainerInner() {
-  const [expanded, setExpanded] = useState(true);
-  const [isExpanded, setIsExpanded] = useState(false);
+function LeoWindow({ onClose, isExpanded, onToggleExpand }: { onClose?: () => void; isExpanded?: boolean; onToggleExpand?: () => void }) {
+  const { currentConfig } = useVersion();
+  return (
+    <div className={`h-full max-w-[720px] min-w-[280px] relative shrink-0 transition-all duration-300 ${isExpanded ? "w-[720px]" : "w-[325px]"}`} data-name="Leo Window" style={{ backgroundImage: currentConfig.panel.panelBgGradient }}>
+      <div className="content-stretch flex flex-col items-start justify-between overflow-clip relative size-full">
+        <div className="relative shrink-0 w-full border-b border-solid" data-name=".Leo Header" style={{ backgroundColor: currentConfig.header.headerBgColor, borderColor: currentConfig.header.borderColor }}>
+          <div className="flex flex-row items-center overflow-clip size-full">
+            <div className="content-stretch flex items-center px-[8px] py-[12px] relative w-full">
+              <LeoIconContainer />
+              <TopIcons onClose={onClose} onToggleExpand={onToggleExpand} />
+            </div>
+          </div>
+        </div>
+        <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px overflow-clip relative w-full" data-name="Leo Window Content">
+          <LeoWindowContent />
+        </div>
+        <BottomInputContainer isExpanded={isExpanded} />
+      </div>
+      {/* Removed decorative border/shadow overlay to allow element selection */}
+    </div>
+  );
+}
+
+export default function LeoContainer() {
+  const { currentConfig, updateConfig } = useVersion();
+  const [expanded, setExpanded] = useState(currentConfig.panel.defaultExpanded);
+  const [isExpanded, setIsExpanded] = useState(currentConfig.panel.defaultWidth === "expanded");
+
+  // Sync local state when config changes (undo/load version)
+  useEffect(() => {
+    setExpanded(currentConfig.panel.defaultExpanded);
+    setIsExpanded(currentConfig.panel.defaultWidth === "expanded");
+  }, [currentConfig.panel.defaultExpanded, currentConfig.panel.defaultWidth]);
 
   const handleToggleExpand = () => {
-    setIsExpanded(!isExpanded);
+    const next = !isExpanded;
+    setIsExpanded(next);
+    updateConfig({ panel: { defaultWidth: next ? "expanded" : "collapsed" } });
   };
 
   const handleClose = () => {
     setExpanded(false);
     setIsExpanded(false);
+    updateConfig({ panel: { defaultExpanded: false, defaultWidth: "collapsed" } });
   };
 
   const handleOpen = () => {
     setExpanded(true);
+    updateConfig({ panel: { defaultExpanded: true } });
   };
 
   return (
@@ -746,7 +577,7 @@ function LeoContainerInner() {
         </div>
       </div>
       <div className={`transition-all duration-300 ease-in-out h-full overflow-hidden ${expanded ? (isExpanded ? "w-[720px]" : "w-[325px]") : "w-0"}`}>
-        <LeoWindowInner onClose={handleClose} isExpanded={isExpanded} onToggleExpand={handleToggleExpand} />
+        <LeoWindow onClose={handleClose} isExpanded={isExpanded} onToggleExpand={handleToggleExpand} />
       </div>
       {/* Avatar button to reopen panel - shown when collapsed */}
       <button
@@ -757,13 +588,5 @@ function LeoContainerInner() {
         <img src={leoOrbHero} alt="Leo" className="size-full object-cover rounded-full" />
       </button>
     </div>
-  );
-}
-
-export default function LeoContainer() {
-  return (
-    <ABRProvider>
-      <LeoContainerInner />
-    </ABRProvider>
   );
 }
