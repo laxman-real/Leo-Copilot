@@ -125,7 +125,17 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background-color: #f3f4f6;
+    background-image: radial-gradient(rgba(0, 0, 0, 0.055) 1px, transparent 1px);
+    background-size: 22px 22px;
+    background-attachment: fixed;
+  }
+
+  /** Chrome preview dark mode (toggled from App) — matches shell, keeps dots visible */
+  body.chrome-dark {
+    background-color: #09090b;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.065) 1px, transparent 1px);
   }
 
   /**
